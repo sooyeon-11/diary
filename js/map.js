@@ -136,7 +136,7 @@
   const ready = new Promise((r) => { readyResolve = r; });
 
   async function initHome() {
-    const key = (Diary.store.getSettings().kakaoKey || '').trim();
+    const key = (Diary.store.getSettings().kakaoKey || Diary.store.DEFAULT_KAKAO_KEY || '').trim();
     if (key && Diary._kakaoBackend) {
       const kb = Diary._kakaoBackend(key);
       try { await kb.init(); active = kb; readyResolve(); return; }

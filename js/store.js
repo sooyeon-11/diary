@@ -160,9 +160,11 @@
   }
 
   /* ---------- 설정 (localStorage) ---------- */
+  // 카카오 JavaScript 키(공개용 — 도메인 등록으로 보호됨). 여기에 내장해두면 모든 기기에서 자동 적용.
+  const DEFAULT_KAKAO_KEY = 'a8b3eea0260d2ee45270ce0e2522e174';
   const SKEY = 'busan-diary.settings';
   function getSettings() {
-    const defaults = { title: '우리의 여행 일기', firstMet: '', calendarMode: 'icon', kakaoKey: '' };
+    const defaults = { title: '우리의 여행 일기', firstMet: '', calendarMode: 'icon', kakaoKey: DEFAULT_KAKAO_KEY };
     try { return Object.assign(defaults, JSON.parse(localStorage.getItem(SKEY) || '{}')); }
     catch (_) { return defaults; }
   }
@@ -233,7 +235,7 @@
   Diary.store = {
     uid, addPhoto, getPhotoBlob, getPhotoURL, deletePhoto,
     getEntry, getAllEntries, putEntry, saveOrRemove, deleteEntry, getAllPlaces,
-    getSettings, setSettings,
+    getSettings, setSettings, DEFAULT_KAKAO_KEY,
     exportBackup, importBackup, estimateUsage,
   };
 })();

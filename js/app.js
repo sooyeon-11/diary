@@ -114,7 +114,7 @@
 
         el('div', { class: 'set-group-title', text: '지도 (선택)' }),
         field('카카오 지도 키', kakaoEl),
-        el('div', { class: 'set-note', html: '한국 지도앱처럼 보이고 <b>가게 이름 검색</b>도 하려면 무료 카카오 키를 넣으세요. 발급 방법은 README의 “카카오 지도” 안내 참고. 비워두면 기본 지도를 써요.' }),
+        el('div', { class: 'set-note', html: '카카오 지도 키가 <b>이미 내장</b>돼 있어서 그대로 두면 돼요. 다른 카카오 키를 쓰고 싶을 때만 여기에 입력하세요.' }),
 
         el('div', { class: 'set-group-title', text: '백업 · 이동' }),
         el('div', { style: 'display:flex;gap:8px' }, [exportBtn, importBtn]),
