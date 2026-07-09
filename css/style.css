@@ -191,22 +191,22 @@ button { font-family: inherit; }
   z-index: 500;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   height: 50px;
-  padding: 0 20px 0 16px;
+  padding: 0 22px;
   border: 0;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--pink-400), var(--pink-600));
   color: #fff;
   font-size: 15px;
   font-weight: 800;
+  line-height: 1;
   letter-spacing: -.01em;
   box-shadow: var(--shadow-md);
   cursor: pointer;
   transition: transform .12s ease, box-shadow .12s ease;
 }
 .fab:active { transform: scale(.96); }
-.fab__plus { font-size: 20px; line-height: 1; margin-top: -1px; }
 
 /* Leaflet 커스텀 마커 */
 .pin {

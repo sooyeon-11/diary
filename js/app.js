@@ -138,6 +138,9 @@
   }
 
   function init() {
+    // 브라우저가 저장공간을 함부로 비우지 않도록 영구 저장 요청 (데이터 보존 강화)
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
     document.getElementById('brandLogo').innerHTML = Diary.mascots.brandLogo();
     applySettings();
 
