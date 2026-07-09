@@ -506,6 +506,7 @@ button { font-family: inherit; }
 }
 .input, .textarea, select.input {
   width: 100%;
+  min-height: 50px;
   font-family: inherit;
   font-size: 16px; /* iOS 확대 방지 */
   color: var(--text);
@@ -515,6 +516,35 @@ button { font-family: inherit; }
   padding: 12px 14px;
   outline: none;
   transition: border-color .15s, box-shadow .15s;
+}
+
+/* 입력칸처럼 생긴 버튼(위치 선택 · 사진 추가) — 폼과 통일 */
+.field-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-soft);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.field-control:hover { border-color: var(--pink-300); }
+.field-control.is-set { color: var(--text); }
+.field-control__ic {
+  flex: 0 0 auto;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--pink-500);
+  font-weight: 700;
 }
 .input:focus, .textarea:focus {
   border-color: var(--pink-400);

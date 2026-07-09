@@ -44,7 +44,7 @@
       const addrEl = el('input', { class: 'input', placeholder: '주소 또는 위치 설명 (선택)', value: base.address });
 
       const locBtn = el('button', {
-        class: 'btn btn--ghost', type: 'button', style: 'height:46px',
+        class: 'field-control', type: 'button',
         onClick: async () => {
           const r = await Diary.map.openPicker({ initial: coords ? [coords.lat, coords.lng] : null });
           if (r) {
@@ -55,7 +55,10 @@
           }
         },
       });
-      function updateLoc() { locBtn.textContent = coords ? '📍 위치 선택됨 · 다시 고르기' : '🗺️ 지도에서 위치 선택'; }
+      function updateLoc() {
+        locBtn.classList.toggle('is-set', !!coords);
+        locBtn.textContent = coords ? '📍 위치 선택됨 · 다시 고르기' : '🗺️ 지도에서 위치 선택';
+      }
       updateLoc();
 
       const photoBox = el('div');
@@ -71,14 +74,14 @@
           }));
         } else {
           photoBox.appendChild(el('button', {
-            class: 'photo-add', type: 'button', style: 'aspect-ratio:auto;height:88px;flex-direction:row;gap:8px',
+            class: 'field-control', type: 'button',
             onClick: async () => {
               const files = await pickFiles(false);
               if (!files || !files.length) return;
               const id = await Diary.store.addPhoto(files[0]);
               addedHere.add(id); photoId = id; renderPhoto();
             },
-          }, [el('span', { text: '＋' }), el('span', { text: '장소 사진 추가' })]));
+          }, [el('span', { class: 'field-control__ic', text: '＋' }), el('span', { text: '장소 사진 추가' })]));
         }
       }
       renderPhoto();
