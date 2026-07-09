@@ -64,7 +64,9 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overscroll-behavior: none;
+  overflow-x: hidden;            /* 페이지 좌우 스크롤 차단 */
 }
+html { overflow-x: hidden; }
 
 button { font-family: inherit; }
 
@@ -154,7 +156,8 @@ button { font-family: inherit; }
 .view {
   position: absolute;
   inset: 0;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 .view[hidden] { display: none; }
@@ -203,7 +206,7 @@ button { font-family: inherit; }
   transition: transform .12s ease, box-shadow .12s ease;
 }
 .fab:active { transform: scale(.96); }
-.fab__plus { font-size: 20px; line-height: 1; margin-top: -2px; }
+.fab__plus { font-size: 20px; line-height: 1; margin-top: -1px; }
 
 /* Leaflet 커스텀 마커 */
 .pin {
@@ -478,7 +481,8 @@ button { font-family: inherit; }
 .sheet__title { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
 .sheet__body {
   flex: 1 1 auto;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding: 16px 18px;
 }
@@ -522,12 +526,14 @@ button { font-family: inherit; }
 /* 버튼 */
 .btn {
   flex: 1;
+  min-width: 0;
   height: 50px;
   border: 0;
   border-radius: var(--radius-sm);
   font-size: 16px;
   font-weight: 800;
   letter-spacing: -.01em;
+  white-space: nowrap;
   cursor: pointer;
   transition: transform .1s ease, filter .15s ease, background .15s;
 }
@@ -612,7 +618,7 @@ button { font-family: inherit; }
 .picker-hint { font-size: 12.5px; color: var(--text-soft); text-align: center; margin-top: 8px; }
 
 /* 카카오 장소 검색 결과 */
-.ksearch__results { max-height: 156px; overflow: auto; margin-bottom: 8px; }
+.ksearch__results { max-height: 156px; overflow-y: auto; overflow-x: hidden; margin-bottom: 8px; }
 .ksearch__row { padding: 9px 10px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; }
 .ksearch__row:hover { background: var(--surface-2); border-color: var(--line-soft); }
 .ksearch__name { font-size: 14px; font-weight: 700; }

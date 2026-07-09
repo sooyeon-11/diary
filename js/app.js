@@ -65,11 +65,11 @@
     const metEl = el('input', { class: 'input', type: 'date', value: s.firstMet || '' });
 
     const exportBtn = el('button', {
-      class: 'btn btn--ghost btn--sm', type: 'button', text: '⬇ 백업 내보내기', style: 'flex:1',
+      class: 'btn btn--ghost btn--sm', type: 'button', text: '⬇ 내보내기', style: 'flex:1',
       onClick: async () => { ui.toast('백업 만드는 중…', 1500); const data = await Diary.store.exportBackup(); downloadJSON(data, '부산일기-백업-' + ui.todayKey() + '.json'); },
     });
     const importBtn = el('button', {
-      class: 'btn btn--ghost btn--sm', type: 'button', text: '⬆ 백업 불러오기', style: 'flex:1',
+      class: 'btn btn--ghost btn--sm', type: 'button', text: '⬆ 불러오기', style: 'flex:1',
       onClick: async () => {
         const files = await pickJSON();
         if (!files || !files.length) return;
