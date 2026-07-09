@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" width="300" height="150">
+  <!-- 구름 -->
+  <g transform="translate(120,80) scale(1.55) translate(-60,-52)">
+    <g transform="translate(60,56) scale(1.07) translate(-60,-56)">
+      <ellipse cx="60" cy="66" rx="42" ry="18" fill="#8cc2d8"/>
+      <circle cx="36" cy="58" r="20" fill="#8cc2d8"/><circle cx="84" cy="58" r="20" fill="#8cc2d8"/>
+      <circle cx="50" cy="42" r="18" fill="#8cc2d8"/><circle cx="72" cy="40" r="19" fill="#8cc2d8"/>
+      <circle cx="60" cy="52" r="24" fill="#8cc2d8"/>
+    </g>
+    <ellipse cx="60" cy="66" rx="42" ry="18" fill="#bfe2f0"/>
+    <circle cx="36" cy="58" r="20" fill="#bfe2f0"/><circle cx="84" cy="58" r="20" fill="#bfe2f0"/>
+    <circle cx="50" cy="42" r="18" fill="#bfe2f0"/><circle cx="72" cy="40" r="19" fill="#bfe2f0"/>
+    <circle cx="60" cy="52" r="24" fill="#bfe2f0"/>
+    <circle cx="52" cy="55" r="3.3" fill="#405d6b"/><circle cx="70" cy="55" r="3.3" fill="#405d6b"/>
+    <path d="M53 62 Q61 69 69 62" fill="none" stroke="#405d6b" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <!-- 하트 -->
+  <g transform="translate(214,92) scale(1.2) translate(-60,-55)">
+    <path d="M60 98 C60 98 14 71 14 41 C14 26 25 16 38 16 C48 16 56 22 60 31 C64 22 72 16 82 16 C95 16 106 26 106 41 C106 71 60 98 60 98 Z"
+          fill="#c6b4ec" stroke="#9f86d8" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="49" cy="46" r="3.3" fill="#4a3e6b"/><circle cx="71" cy="46" r="3.3" fill="#4a3e6b"/>
+    <path d="M52 54 Q60 62 68 54" fill="none" stroke="#4a3e6b" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

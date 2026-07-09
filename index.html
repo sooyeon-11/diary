@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>우리의 여행 일기</title>
+  <meta name="description" content="함께 다녀온 날들을 지도와 달력에 기록하는 우리만의 일기장" />
+  <meta name="theme-color" content="#ff8da1" />
+
+  <!-- 아이콘 / PWA -->
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./assets/favicon.svg" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="여행일기" />
+
+  <!-- SUIT 폰트 -->
+  <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet" />
+
+  <!-- Leaflet 지도 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
+  <!-- 앱 스타일 -->
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 상단바 -->
+    <header class="appbar">
+      <button class="brand" id="brandBtn" type="button" title="홈">
+        <span class="brand__logo" id="brandLogo"></span>
+        <span class="brand__title" id="brandTitle">우리의 여행 일기</span>
+      </button>
+      <div class="appbar__right">
+        <span class="dday" id="dday" hidden></span>
+        <button class="iconbtn" id="settingsBtn" type="button" aria-label="설정">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 8a4 4 0 100 8 4 4 0 000-8zm8.94 4a7 7 0 00-.13-1.3l2-1.56-2-3.46-2.36.95a7.2 7.2 0 00-2.25-1.3L15.8 2h-4l-.4 2.53a7.2 7.2 0 00-2.25 1.3L6.8 4.88l-2 3.46 2 1.56a7.2 7.2 0 000 2.6l-2 1.56 2 3.46 2.36-.95c.68.54 1.44.98 2.25 1.3l.4 2.53h4l.4-2.53a7.2 7.2 0 002.25-1.3l2.36.95 2-3.46-2-1.56c.08-.43.13-.86.13-1.3z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 본문 -->
+    <main id="view">
+      <!-- 지도 -->
+      <section class="view view--map is-active" id="view-map">
+        <div id="map" class="map"></div>
+        <div class="map-overlay">
+          <div class="chip" id="placeCount">기록된 장소를 불러오는 중…</div>
+        </div>
+        <button class="fab" id="addPlaceFab" type="button">
+          <span class="fab__plus">＋</span><span>다녀온 곳</span>
+        </button>
+      </section>
+
+      <!-- 달력 -->
+      <section class="view view--cal" id="view-cal" hidden>
+        <div class="cal">
+          <div class="cal__head">
+            <button class="cal__nav" id="calPrev" type="button" aria-label="이전 달">‹</button>
+            <h2 class="cal__title" id="calTitle">—</h2>
+            <button class="cal__nav" id="calNext" type="button" aria-label="다음 달">›</button>
+          </div>
+          <div class="cal__week">
+            <span class="cal__wd cal__wd--sun">일</span><span class="cal__wd">월</span><span class="cal__wd">화</span><span class="cal__wd">수</span><span class="cal__wd">목</span><span class="cal__wd">금</span><span class="cal__wd cal__wd--sat">토</span>
+          </div>
+          <div class="cal__grid" id="calGrid"></div>
+        </div>
+      </section>
+
+      <!-- 모아보기 -->
+      <section class="view view--list" id="view-list" hidden>
+        <div class="list" id="entryList"></div>
+      </section>
+    </main>
+
+    <!-- 하단 탭 -->
+    <nav class="tabbar" id="tabbar">
+      <button class="tab is-active" data-view="map" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 00-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6.5a2.5 2.5 0 010 5z"/></svg>
+        <span>지도</span>
+      </button>
+      <button class="tab" data-view="cal" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2v2H5a2 2 0 00-2 2v13a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2V2h-2v2H9V2H7zM5 9h14v10H5V9z"/></svg>
+        <span>달력</span>
+      </button>
+      <button class="tab" data-view="list" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 5h16v3H4V5zm0 5.5h16v3H4v-3zM4 16h16v3H4v-3z"/></svg>
+        <span>모아보기</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- 모달이 쌓이는 곳 -->
+  <div id="modalRoot"></div>
+  <div id="toastRoot"></div>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- 앱 스크립트 (의존성 순서 유지) -->
+  <script src="./js/ui.js"></script>
+  <script src="./js/mascots.js"></script>
+  <script src="./js/store.js"></script>
+  <script src="./js/map.js"></script>
+  <script src="./js/map-kakao.js"></script>
+  <script src="./js/calendar.js"></script>
+  <script src="./js/entry.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

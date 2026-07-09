@@ -1,0 +1,15 @@
+# 로컬 개발 도구 (미리보기 서버 등) — 깃허브엔 불필요
+.claude/
+
+# OS/에디터 부산물
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 백업 파일
+부산일기-백업-*.json
+*-백업-*.json
+
+# 로그
+*.log
+node_modules/
