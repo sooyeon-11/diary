@@ -18,7 +18,7 @@
   function collectDayPhotos(entry) {
     const ids = [];
     (entry.photos || []).forEach((id) => ids.push(id));
-    (entry.places || []).forEach((p) => { if (p.photo) ids.push(p.photo); });
+    (entry.places || []).forEach((p) => Diary.store.placePhotos(p).forEach((id) => ids.push(id)));
     return ids;
   }
 
@@ -37,7 +37,6 @@
     const startWd = first.getDay();
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
     const todayKey = ui.todayKey();
-    const mode = Diary.store.getSettings().calendarMode || 'icon';
 
     for (let i = 0; i < startWd; i++) grid.appendChild(el('div', { class: 'day day--empty' }));
 
@@ -59,7 +58,7 @@
 
       if (entry) {
         const dayPhotos = collectDayPhotos(entry);
-        if (mode === 'photo' && dayPhotos.length) {
+        if (entry.calStyle === 'photo' && dayPhotos.length) {
           cell.classList.add('day--photo');
           Diary.store.getPhotoURL(dayPhotos[0]).then((u) => {
             if (u) cell.style.backgroundImage =

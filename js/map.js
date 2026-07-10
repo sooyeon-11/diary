@@ -11,10 +11,12 @@
   /* 장소 팝업 DOM (두 백엔드 공용) */
   function buildPopup(place) {
     const wrap = ui.el('div', { class: 'pop' });
-    if (place.photo) {
-      const img = ui.el('img', { class: 'pop__img', alt: place.name || '', style: 'cursor:zoom-in', onClick: () => ui.lightbox([place.photo], 0) });
-      Diary.store.getPhotoURL(place.photo).then((u) => { if (u) img.src = u; });
+    const pph = Diary.store.placePhotos(place);
+    if (pph.length) {
+      const img = ui.el('img', { class: 'pop__img', alt: place.name || '', style: 'cursor:zoom-in', onClick: () => ui.lightbox(pph, 0) });
+      Diary.store.getPhotoURL(pph[0]).then((u) => { if (u) img.src = u; });
       wrap.appendChild(img);
+      if (pph.length > 1) wrap.appendChild(ui.el('div', { class: 'pop__addr', text: '📷 사진 ' + pph.length + '장' }));
     }
     wrap.appendChild(ui.el('div', { class: 'pop__name', text: place.name || '이름 없는 장소' }));
     if (place.address) wrap.appendChild(ui.el('div', { class: 'pop__addr', text: place.address }));

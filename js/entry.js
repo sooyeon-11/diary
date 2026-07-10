@@ -22,7 +22,7 @@
   function refsOf(entry) {
     const s = new Set();
     (entry.photos || []).forEach((id) => s.add(id));
-    (entry.places || []).forEach((p) => { if (p.photo) s.add(p.photo); });
+    (entry.places || []).forEach((p) => Diary.store.placePhotos(p).forEach((id) => s.add(id)));
     return s;
   }
 
@@ -33,10 +33,10 @@
     return new Promise((resolve) => {
       const base = opts.place
         ? JSON.parse(JSON.stringify(opts.place))
-        : { id: Diary.store.uid(), name: '', address: '', lat: null, lng: null, photo: null };
+        : { id: Diary.store.uid(), name: '', address: '', lat: null, lng: null, photos: [] };
       let coords = base.lat != null && base.lng != null ? { lat: base.lat, lng: base.lng } : null;
-      const originalPhoto = base.photo || null;
-      let photoId = base.photo || null;
+      let photos = Diary.store.placePhotos(base).slice();
+      const originalPhotos = new Set(photos);
       const addedHere = new Set();
       let decided = false, saved = false;
 
@@ -62,29 +62,33 @@
       updateLoc();
 
       const photoBox = el('div');
-      function renderPhoto() {
+      function renderPhotos() {
         ui.clear(photoBox);
-        if (photoId) {
-          const img = el('img', { alt: '', style: 'width:100%;height:150px;object-fit:cover;border-radius:12px;border:1px solid var(--line-soft);cursor:zoom-in', onClick: () => Diary.ui.lightbox([photoId], 0) });
-          Diary.store.getPhotoURL(photoId).then((u) => { if (u) img.src = u; });
-          photoBox.appendChild(img);
-          photoBox.appendChild(el('button', {
-            class: 'link-btn', type: 'button', text: '사진 삭제',
-            onClick: () => { if (addedHere.has(photoId)) { Diary.store.deletePhoto(photoId); addedHere.delete(photoId); } photoId = null; renderPhoto(); },
+        const grid = el('div', { class: 'photo-grid' });
+        photos.forEach((id, idx) => {
+          const cell = el('div', { class: 'photo-cell' });
+          const img = el('img', { alt: '', style: 'cursor:zoom-in', onClick: () => Diary.ui.lightbox(photos, idx) });
+          Diary.store.getPhotoURL(id).then((u) => { if (u) img.src = u; });
+          cell.appendChild(img);
+          cell.appendChild(el('button', {
+            class: 'photo-cell__del', type: 'button', text: '×',
+            onClick: () => { photos = photos.filter((x) => x !== id); renderPhotos(); },
           }));
-        } else {
-          photoBox.appendChild(el('button', {
-            class: 'field-control', type: 'button',
-            onClick: async () => {
-              const files = await pickFiles(false);
-              if (!files || !files.length) return;
-              const id = await Diary.store.addPhoto(files[0]);
-              addedHere.add(id); photoId = id; renderPhoto();
-            },
-          }, [el('span', { class: 'field-control__ic', text: '＋' }), el('span', { text: '장소 사진 추가' })]));
-        }
+          grid.appendChild(cell);
+        });
+        grid.appendChild(el('button', {
+          class: 'photo-add', type: 'button',
+          onClick: async () => {
+            const files = await pickFiles(true);
+            if (!files || !files.length) return;
+            ui.toast('사진 저장 중…', 1200);
+            for (const f of files) { const id = await Diary.store.addPhoto(f); addedHere.add(id); photos.push(id); }
+            renderPhotos();
+          },
+        }, [el('span', { text: '＋' }), el('span', { text: '사진' })]));
+        photoBox.appendChild(grid);
       }
-      renderPhoto();
+      renderPhotos();
 
       let dateEl = null;
       const body = [];
@@ -103,7 +107,7 @@
             class: 'btn btn--primary', type: 'button', text: '저장',
             onClick: () => {
               if (!coords) return ui.toast('지도에서 위치를 선택해 주세요');
-              const place = { id: base.id, name: nameEl.value.trim(), address: addrEl.value.trim(), lat: coords.lat, lng: coords.lng, photo: photoId };
+              const place = { id: base.id, name: nameEl.value.trim(), address: addrEl.value.trim(), lat: coords.lat, lng: coords.lng, photos: photos.slice() };
               decided = true; saved = true; m.close();
               resolve(opts.withDate ? { place, date: dateEl.value || ui.todayKey() } : { place });
             },
@@ -111,7 +115,7 @@
         ],
         onClose: () => {
           if (!saved) {
-            addedHere.forEach((id) => { if (id !== originalPhoto) Diary.store.deletePhoto(id); });
+            addedHere.forEach((id) => { if (!originalPhotos.has(id)) Diary.store.deletePhoto(id); });
             if (!decided) resolve(null);
           }
         },
@@ -126,6 +130,15 @@
     const originalRefs = refsOf(existing || {});
     const addedIds = new Set();
     let saved = false;
+
+    // 달력에 이 날을 어떻게 보여줄지 (날짜별)
+    let calStyle = draft.calStyle === 'photo' ? 'photo' : 'icon';
+    const styleSeg = el('div', { class: 'seg' });
+    const styleBtn = (val, label) => el('button', {
+      class: 'seg__btn' + (calStyle === val ? ' is-on' : ''), type: 'button', text: label, dataset: { val },
+      onClick: () => { calStyle = val; styleSeg.querySelectorAll('.seg__btn').forEach((b) => b.classList.toggle('is-on', b.dataset.val === val)); },
+    });
+    styleSeg.append(styleBtn('icon', '아이콘'), styleBtn('photo', '사진 배경'));
 
     const noteEl = el('textarea', { class: 'textarea', placeholder: '그날의 이야기를 적어보세요…', value: draft.note });
     const photoGrid = el('div', { class: 'photo-grid' });
@@ -162,17 +175,18 @@
         placeWrap.appendChild(el('div', { class: 'set-note', text: '아직 추가한 장소가 없어요. 다녀온 식당·카페·명소를 담아보세요.' }));
       }
       draft.places.forEach((p, idx) => {
-        const img = p.photo
+        const pph = Diary.store.placePhotos(p);
+        const img = pph.length
           ? el('img', { class: 'place-card__img', alt: '' })
           : el('div', { class: 'place-card__img place-card__img--ph', html: Diary.mascots.heart(30) });
-        if (p.photo) Diary.store.getPhotoURL(p.photo).then((u) => { if (u) img.src = u; });
+        if (pph.length) Diary.store.getPhotoURL(pph[0]).then((u) => { if (u) img.src = u; });
         placeWrap.appendChild(el('div', { class: 'place-card' }, [
           img,
           el('div', {
             class: 'place-card__txt', style: 'cursor:pointer',
-            onClick: async () => { const r = await openPlaceEditor({ place: p }); if (r && r.place) { if (r.place.photo && !originalRefs.has(r.place.photo)) addedIds.add(r.place.photo); draft.places[idx] = r.place; renderPlaces(); } },
+            onClick: async () => { const r = await openPlaceEditor({ place: p }); if (r && r.place) { (r.place.photos || []).forEach((id) => { if (!originalRefs.has(id)) addedIds.add(id); }); draft.places[idx] = r.place; renderPlaces(); } },
           }, [
-            el('div', { class: 'place-card__name', text: p.name || '이름 없는 장소' }),
+            el('div', { class: 'place-card__name', text: (p.name || '이름 없는 장소') + (pph.length > 1 ? ' · 📷' + pph.length : '') }),
             p.address ? el('div', { class: 'place-card__addr', text: p.address }) : null,
           ]),
           el('button', { class: 'place-card__del', type: 'button', html: '×', onClick: () => { draft.places.splice(idx, 1); renderPlaces(); } }),
@@ -187,7 +201,7 @@
       class: 'link-btn', type: 'button', text: '＋ 장소 추가',
       onClick: async () => {
         const r = await openPlaceEditor({});
-        if (r && r.place) { if (r.place.photo && !originalRefs.has(r.place.photo)) addedIds.add(r.place.photo); draft.places.push(r.place); renderPlaces(); }
+        if (r && r.place) { (r.place.photos || []).forEach((id) => { if (!originalRefs.has(id)) addedIds.add(id); }); draft.places.push(r.place); renderPlaces(); }
       },
     });
 
@@ -209,6 +223,7 @@
       class: 'btn btn--primary', type: 'button', text: '저장',
       onClick: async () => {
         draft.note = noteEl.value;
+        draft.calStyle = calStyle;
         await Diary.store.saveOrRemove(draft);
         // 참조 안 되는 사진 정리
         const finalRefs = refsOf(draft);
@@ -225,6 +240,11 @@
       body: [
         field('그날의 기록', noteEl),
         el('div', { class: 'field' }, [el('label', { class: 'field__label', text: '사진' }), photoGrid]),
+        el('div', { class: 'field' }, [
+          el('label', { class: 'field__label', text: '달력에 이 날 표시' }),
+          styleSeg,
+          el('div', { class: 'set-note', text: '“사진 배경”은 달력 칸에 이 날 사진이 깔려요 (사진이 있을 때).' }),
+        ]),
         el('div', { class: 'field' }, [
           el('div', { class: 'section-label' }, ['다녀온 곳', addPlaceBtn]),
           placeWrap,
@@ -256,7 +276,7 @@
   function entryCard(e) {
     const entryPhotos = [];
     (e.photos || []).forEach((id) => entryPhotos.push(id));
-    (e.places || []).forEach((p) => { if (p.photo) entryPhotos.push(p.photo); });
+    (e.places || []).forEach((p) => Diary.store.placePhotos(p).forEach((id) => entryPhotos.push(id)));
     const coverId = entryPhotos[0] || null;
     const cover = coverId
       ? el('img', {

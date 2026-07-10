@@ -107,12 +107,25 @@
     return all;
   }
 
+  // 장소: 사진을 배열(photos)로 통일 (예전 단일 photo 자동 이전)
+  function normalizePlace(p) {
+    let photos = Array.isArray(p.photos) ? p.photos.slice() : [];
+    if (!photos.length && p.photo) photos = [p.photo];
+    return { id: p.id, name: p.name || '', address: p.address || '', lat: p.lat, lng: p.lng, photos };
+  }
+  function placePhotos(p) {
+    if (p && Array.isArray(p.photos) && p.photos.length) return p.photos;
+    if (p && p.photo) return [p.photo];
+    return [];
+  }
+
   function normalizeEntry(e) {
     return {
       date: e.date,
       note: e.note || '',
       photos: Array.isArray(e.photos) ? e.photos : [],
-      places: Array.isArray(e.places) ? e.places : [],
+      places: (Array.isArray(e.places) ? e.places : []).map(normalizePlace),
+      calStyle: e.calStyle === 'photo' ? 'photo' : 'icon', // 달력 표시: 날짜별
       updatedAt: Date.now(),
     };
   }
@@ -140,7 +153,7 @@
       // 연결된 사진들 정리
       const ids = [];
       (existing.photos || []).forEach((id) => ids.push(id));
-      (existing.places || []).forEach((p) => { if (p.photo) ids.push(p.photo); });
+      (existing.places || []).forEach((p) => placePhotos(p).forEach((id) => ids.push(id)));
       for (const id of ids) await deletePhoto(id);
     }
     const store = await tx('entries', 'readwrite');
@@ -185,7 +198,7 @@
     const photoIds = new Set();
     entries.forEach((e) => {
       (e.photos || []).forEach((id) => photoIds.add(id));
-      (e.places || []).forEach((p) => { if (p.photo) photoIds.add(p.photo); });
+      (e.places || []).forEach((p) => placePhotos(p).forEach((id) => photoIds.add(id)));
     });
     const photos = {};
     for (const id of photoIds) {
@@ -234,7 +247,7 @@
 
   Diary.store = {
     uid, addPhoto, getPhotoBlob, getPhotoURL, deletePhoto,
-    getEntry, getAllEntries, putEntry, saveOrRemove, deleteEntry, getAllPlaces,
+    getEntry, getAllEntries, putEntry, saveOrRemove, deleteEntry, getAllPlaces, placePhotos,
     getSettings, setSettings, DEFAULT_KAKAO_KEY,
     exportBackup, importBackup, estimateUsage,
   };

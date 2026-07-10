@@ -84,19 +84,6 @@
       },
     });
 
-    const curMode = Diary.store.getSettings().calendarMode || 'icon';
-    const seg = el('div', { class: 'seg' });
-    const segBtn = (val, label) => el('button', {
-      class: 'seg__btn' + (curMode === val ? ' is-on' : ''), type: 'button', text: label,
-      dataset: { val },
-      onClick: () => {
-        Diary.store.setSettings({ calendarMode: val });
-        seg.querySelectorAll('.seg__btn').forEach((b) => b.classList.toggle('is-on', b.dataset.val === val));
-        Diary.calendar.render();
-      },
-    });
-    seg.append(segBtn('icon', '아이콘'), segBtn('photo', '사진 배경'));
-
     const prevKakao = (s.kakaoKey || '').trim();
     const kakaoEl = el('input', { class: 'input', value: s.kakaoKey || '', placeholder: '카카오 JavaScript 키 (선택)' });
 
@@ -107,10 +94,6 @@
         field('제목', titleEl),
         field('처음 만난 날', metEl),
         el('div', { class: 'set-note', text: '처음 만난 날을 넣으면 상단에 함께한 날수가 표시돼요.' }),
-
-        el('div', { class: 'set-group-title', text: '달력에 사진 표시' }),
-        seg,
-        el('div', { class: 'set-note', text: '“사진 배경”을 고르면 사진이 있는 날은 달력 칸에 그날 사진이 깔려요.' }),
 
         el('div', { class: 'set-group-title', text: '지도 (선택)' }),
         field('카카오 지도 키', kakaoEl),
